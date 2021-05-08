@@ -42,6 +42,7 @@ import (
 	"github.com/yuin/goldmark/renderer/html"
 	"github.com/yuin/goldmark/text"
 	"github.com/yuin/goldmark/util"
+	pExtension "github.com/zeromake/pkg/goldmark"
 )
 
 // Provider is the package entry point.
@@ -146,6 +147,18 @@ func newMarkdown(pcfg converter.ProviderConfig) goldmark.Markdown {
 
 	if cfg.Parser.Attribute.Block {
 		extensions = append(extensions, attributes.New())
+	}
+
+	for _, rawExtension := range cfg.Extensions.RawExtensions {
+		if rawExtension.IsBlock {
+			extensions = append(extensions, &pExtension.RawBlock{
+				Option: rawExtension.RawOption,
+			})
+		} else {
+			extensions = append(extensions, &pExtension.RawInline{
+				Option: rawExtension.RawOption,
+			})
+		}
 	}
 
 	md := goldmark.New(

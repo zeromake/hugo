@@ -14,6 +14,10 @@
 // Package goldmark_config holds Goldmark related configuration.
 package goldmark_config
 
+import (
+	pExtension "github.com/zeromake/pkg/goldmark"
+)
+
 const (
 	AutoHeadingIDTypeGitHub      = "github"
 	AutoHeadingIDTypeGitHubAscii = "github-ascii"
@@ -51,6 +55,11 @@ type Config struct {
 	Extensions Extensions
 }
 
+type RawExtension struct {
+	IsBlock bool
+	pExtension.RawOption
+}
+
 type Extensions struct {
 	Typographer    bool
 	Footnote       bool
@@ -61,6 +70,7 @@ type Extensions struct {
 	Strikethrough bool
 	Linkify       bool
 	TaskList      bool
+	RawExtensions []RawExtension
 }
 
 type Renderer struct {

@@ -59,6 +59,7 @@ require (
 	github.com/tdewolff/minify/v2 v2.9.16
 	github.com/yuin/goldmark v1.3.5
 	github.com/yuin/goldmark-highlighting v0.0.0-20200307114337-60d527fdb691
+	github.com/zeromake/pkg/goldmark v0.0.0-00010101000000-000000000000
 	gocloud.dev v0.20.0
 	golang.org/x/image v0.0.0-20210220032944-ac19c3e999fb
 	golang.org/x/net v0.0.0-20210316092652-d523dce5a7f4
@@ -71,3 +72,8 @@ require (
 )
 
 go 1.16
+
+replace (
+	github.com/zeromake/pkg => ../pkg
+	github.com/zeromake/pkg/goldmark => ../pkg/goldmark
+)
