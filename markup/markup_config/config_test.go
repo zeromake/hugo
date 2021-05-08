@@ -86,4 +86,29 @@ func TestConfig(t *testing.T) {
 		c.Assert(conf.Goldmark.Parser.Attribute.Block, qt.Equals, false)
 
 	})
+
+	c.Run("raw", func(c *qt.C) {
+		c.Parallel()
+		v := viper.New()
+
+		v.Set("markup", map[string]interface{}{
+			"goldmark": map[string]interface{}{
+				"extensions": map[string]interface{}{
+					"raws": []map[string]interface{}{
+						{
+							"IsBlock":   true,
+							"ClassName": "text",
+						},
+					},
+				},
+			},
+		})
+		conf, err := Decode(v)
+		c.Assert(err, qt.IsNil)
+
+		c.Assert(len(conf.Goldmark.Extensions.Raws), qt.Equals, 1)
+		c.Assert(conf.Goldmark.Extensions.Raws[0].IsBlock, qt.Equals, true)
+		c.Assert(conf.Goldmark.Extensions.Raws[0].ClassName, qt.Equals, "text")
+
+	})
 }

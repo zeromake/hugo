@@ -26,7 +26,6 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/gobuffalo/flect v0.2.2
 	github.com/gobwas/glob v0.2.3
-	github.com/gohugoio/go-i18n v2.1.3-0.20210430103248-4c28c89f8013+incompatible // indirect
 	github.com/gohugoio/go-i18n/v2 v2.1.3-0.20210430103248-4c28c89f8013
 	github.com/gohugoio/testmodBuilder/mods v0.0.0-20190520184928-c56af20f2e95
 	github.com/google/go-cmp v0.5.5
@@ -59,6 +58,7 @@ require (
 	github.com/tdewolff/minify/v2 v2.9.16
 	github.com/yuin/goldmark v1.3.5
 	github.com/yuin/goldmark-highlighting v0.0.0-20200307114337-60d527fdb691
+	github.com/zeromake/goldmark v0.0.0-20210508103823-05b56a79a811
 	gocloud.dev v0.20.0
 	golang.org/x/image v0.0.0-20210220032944-ac19c3e999fb
 	golang.org/x/net v0.0.0-20210316092652-d523dce5a7f4
