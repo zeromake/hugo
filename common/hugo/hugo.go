@@ -102,7 +102,7 @@ func GetExecEnviron(workDir string, cfg config.Provider, fs afero.Fs) []string {
 	if err == nil {
 		for _, fi := range fis {
 			key := fmt.Sprintf("HUGO_FILE_%s", strings.ReplaceAll(strings.ToUpper(fi.Name()), ".", "_"))
-			value := fi.(hugofs.FileMetaInfo).Meta().Filename()
+			value := fi.(hugofs.FileMetaInfo).Meta().Filename
 			config.SetEnvVars(&env, key, value)
 		}
 	}
@@ -122,7 +122,8 @@ func GetDependencyList() []string {
 	if IsExtended {
 		deps = append(
 			deps,
-			formatDep("github.com/sass/libsass", "3.6.4"),
+			// TODO(bep) consider adding a DepsNonGo() method to these upstream projects.
+			formatDep("github.com/sass/libsass", "3.6.5"),
 			formatDep("github.com/webmproject/libwebp", "v1.2.0"),
 		)
 	}
@@ -139,4 +140,14 @@ func GetDependencyList() []string {
 	sort.Strings(deps)
 
 	return deps
+}
+
+// IsRunningAsTest reports whether we are running as a test.
+func IsRunningAsTest() bool {
+	for _, arg := range os.Args {
+		if strings.HasPrefix(arg, "-test") {
+			return true
+		}
+	}
+	return false
 }
