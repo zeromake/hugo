@@ -34,6 +34,7 @@ import (
 	"github.com/yuin/goldmark/renderer"
 	"github.com/yuin/goldmark/renderer/html"
 	"github.com/yuin/goldmark/text"
+	raw_extension "github.com/zeromake/goldmark/extension"
 )
 
 const (
@@ -160,6 +161,9 @@ func newMarkdown(pcfg converter.ProviderConfig) goldmark.Markdown {
 		extensions = append(extensions, attributes.New())
 	}
 
+	for _, rawExtension := range cfg.Extensions.Raws {
+		extensions = append(extensions, raw_extension.NewRawExtension(rawExtension))
+	}
 	md := goldmark.New(
 		goldmark.WithExtensions(
 			extensions...,

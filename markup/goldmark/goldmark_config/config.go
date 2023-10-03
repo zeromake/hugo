@@ -14,6 +14,10 @@
 // Package goldmark_config holds Goldmark related configuration.
 package goldmark_config
 
+import (
+	raw_extension "github.com/zeromake/goldmark/extension"
+)
+
 const (
 	AutoHeadingIDTypeGitHub      = "github"
 	AutoHeadingIDTypeGitHubAscii = "github-ascii"
@@ -82,6 +86,7 @@ type Extensions struct {
 	LinkifyProtocol string
 	TaskList        bool
 	CJK             CJK
+	Raws            []raw_extension.RawOption
 }
 
 // Typographer holds typographer configuration.

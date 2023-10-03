@@ -64,6 +64,7 @@ require (
 	github.com/tdewolff/minify/v2 v2.12.7
 	github.com/tdewolff/parse/v2 v2.6.6
 	github.com/yuin/goldmark v1.5.6
+	github.com/zeromake/goldmark v0.0.0-20210508103823-05b56a79a811
 	go.uber.org/atomic v1.11.0
 	go.uber.org/automaxprocs v1.5.3
 	gocloud.dev v0.34.0
@@ -138,6 +139,7 @@ require (
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/zeromake/pkg v0.0.0-20210508102858-857743f90c0a // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/crypto v0.13.0 // indirect
 	golang.org/x/mod v0.12.0 // indirect
