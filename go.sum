@@ -452,8 +452,8 @@ github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 github.com/yuin/goldmark v1.5.6 h1:COmQAWTCcGetChm3Ig7G/t8AFAN00t+o8Mt4cf7JpwA=
 github.com/yuin/goldmark v1.5.6/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
-github.com/zeromake/goldmark v0.0.0-20210508103823-05b56a79a811 h1:lejQGp3sWx+LeLk7PGeYRobuyTcfPPwTguWVf1dotm4=
-github.com/zeromake/goldmark v0.0.0-20210508103823-05b56a79a811/go.mod h1:YyFc8sd5JvO0mtj+vwVR1Tgp7LBmTUa3p8vZ+gdwbb4=
+github.com/zeromake/goldmark v0.0.0-20231005043034-92ffc6e07103 h1:xV7lil9DnWK/cyboFCLWHro/27oTHKjnAh0+i0LSiAw=
+github.com/zeromake/goldmark v0.0.0-20231005043034-92ffc6e07103/go.mod h1:YIAlo25pvAFPcH8eNjRKyTNPmx1V9RFXMZuS2GM4iU0=
 github.com/zeromake/pkg v0.0.0-20210508102858-857743f90c0a h1:vVSltRwDUdsvOJqhhX6mxq5MPCijeLcrySkwxaX8w74=
 github.com/zeromake/pkg v0.0.0-20210508102858-857743f90c0a/go.mod h1:ODa10q+4xDva6juJS9sLyNYC2s7h3uAfFKREe2JeQwc=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=

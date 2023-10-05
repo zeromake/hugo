@@ -64,7 +64,7 @@ require (
 	github.com/tdewolff/minify/v2 v2.12.7
 	github.com/tdewolff/parse/v2 v2.6.6
 	github.com/yuin/goldmark v1.5.6
-	github.com/zeromake/goldmark v0.0.0-20210508103823-05b56a79a811
+	github.com/zeromake/goldmark v0.0.0-20231005043034-92ffc6e07103
 	go.uber.org/atomic v1.11.0
 	go.uber.org/automaxprocs v1.5.3
 	gocloud.dev v0.34.0
