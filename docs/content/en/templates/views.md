@@ -34,8 +34,7 @@ To create a new view, create a template in each of your different content type d
         summary.html
 ```
 
-Hugo also has support for a default content template to be used in the event that a specific content view template has not been provided for that type. Content views can also be defined in the `_default` directory and will work the same as list and single templates who eventually trickle down to the `_default` directory as a matter of the lookup order.
-
+Hugo also has support for a default content view template to be used in the event that a specific content view template has not been provided for that type. Content views can also be defined in the `_default` directory and will work the same as list and single templates who eventually trickle down to the `_default` directory as a matter of the lookup order.
 
 ```txt
 ▾ layouts/
@@ -47,7 +46,7 @@ Hugo also has support for a default content template to be used in the event tha
 
 ## Which template will be rendered?
 
-The following is the [lookup order][lookup] for content views:
+The following is the [lookup order] for content views:
 
 1. `/layouts/<TYPE>/<VIEW>.html`
 2. `/layouts/_default/<VIEW>.html`
@@ -62,7 +61,7 @@ The following example demonstrates how to use content views inside your [list te
 
 In this example, `.Render` is passed into the template to call the [render function][render]. `.Render` is a special function that instructs content to render itself with the view template provided as the first argument. In this case, the template is going to render the `summary.html` view that follows:
 
-{{< code file="layouts/_default/list.html" >}}
+{{< code file=layouts/_default/list.html >}}
 <main id="main">
   <div>
     <h1 id="title">{{ .Title }}</h1>
@@ -75,17 +74,17 @@ In this example, `.Render` is passed into the template to call the [render funct
 
 ### `summary.html`
 
-Hugo will pass the entire page object to the following `summary.html` view template. (See [Page Variables][pagevars] for a complete list.)
+Hugo passes the page object to the following `summary.html` view template.
 
-{{< code file="layouts/_default/summary.html" >}}
+{{< code file=layouts/_default/summary.html >}}
 <article class="post">
   <header>
-    <h2><a href='{{ .Permalink }}'> {{ .Title }}</a> </h2>
+    <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
     <div class="post-meta">{{ .Date.Format "Mon, Jan 2, 2006" }} - {{ .FuzzyWordCount }} Words </div>
   </header>
   {{ .Summary }}
   <footer>
-  <a href='{{ .Permalink }}'><nobr>Read more →</nobr></a>
+  <a href='{{ .RelPermalink }}'>Read&nbsp;more&nbsp;&raquo;</a>
   </footer>
 </article>
 {{< /code >}}
@@ -94,21 +93,15 @@ Hugo will pass the entire page object to the following `summary.html` view templ
 
 Continuing on the previous example, we can change our render function to use a smaller `li.html` view by changing the argument in the call to the `.Render` function (i.e., `{{ .Render "li" }}`).
 
-{{< code file="layouts/_default/li.html" >}}
+{{< code file=layouts/_default/li.html >}}
 <li>
-  <a href="{{ .Permalink }}">{{ .Title }}</a>
+  <a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
   <div class="meta">{{ .Date.Format "Mon, Jan 2, 2006" }}</div>
 </li>
 {{< /code >}}
 
 [lists]: /templates/lists/
-[lookup]: /templates/lookup-order/
-[pagevars]: /variables/page/
-[render]: /functions/render/
+[render]: /methods/page/render/
 [single]: /templates/single-page-templates/
-[spf]: https://spf13.com
-[spfsourceli]: https://github.com/spf13/spf13.com/blob/master/layouts/_default/li.html
-[spfsourcesection]: https://github.com/spf13/spf13.com/blob/master/layouts/_default/section.html
-[spfsourcesummary]: https://github.com/spf13/spf13.com/blob/master/layouts/_default/summary.html
 [summaries]: /content-management/summaries/
 [taxonomylists]: /templates/taxonomy-templates/

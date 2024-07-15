@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -42,11 +43,9 @@ import (
 
 	"github.com/gohugoio/hugo/config"
 
-	"github.com/rogpeppe/go-internal/module"
+	"golang.org/x/mod/module"
 
 	"github.com/gohugoio/hugo/common/hugio"
-
-	"errors"
 
 	"github.com/spf13/afero"
 )
@@ -142,7 +141,7 @@ type Client struct {
 	goBinaryStatus goBinaryStatus
 }
 
-// Graph writes a module dependenchy graph to the given writer.
+// Graph writes a module dependency graph to the given writer.
 func (c *Client) Graph(w io.Writer) error {
 	mc, coll := c.collect(true)
 	if coll.err != nil {
@@ -199,7 +198,7 @@ func (c *Client) Vendor() error {
 	if err := c.rmVendorDir(vendorDir); err != nil {
 		return err
 	}
-	if err := c.fs.MkdirAll(vendorDir, 0755); err != nil {
+	if err := c.fs.MkdirAll(vendorDir, 0o755); err != nil {
 		return err
 	}
 
@@ -260,7 +259,7 @@ func (c *Client) Vendor() error {
 			} else {
 				targetDir := filepath.Dir(targetFilename)
 
-				if err := c.fs.MkdirAll(targetDir, 0755); err != nil {
+				if err := c.fs.MkdirAll(targetDir, 0o755); err != nil {
 					return fmt.Errorf("failed to make target dir: %w", err)
 				}
 
@@ -303,7 +302,7 @@ func (c *Client) Vendor() error {
 	}
 
 	if modulesContent.Len() > 0 {
-		if err := afero.WriteFile(c.fs, filepath.Join(vendorDir, vendorModulesFilename), modulesContent.Bytes(), 0666); err != nil {
+		if err := afero.WriteFile(c.fs, filepath.Join(vendorDir, vendorModulesFilename), modulesContent.Bytes(), 0o666); err != nil {
 			return err
 		}
 	}
@@ -318,14 +317,33 @@ func (c *Client) Get(args ...string) error {
 		patch := update && (args[0] == "-u=patch") //
 
 		// We need to be explicit about the modules to get.
-		for _, m := range c.moduleConfig.Imports {
-			if !isProbablyModule(m.Path) {
-				// Skip themes/components stored below /themes etc.
-				// There may be false positives in the above, but those
-				// should be rare, and they will fail below with an
-				// "cannot find module providing ..." message.
-				continue
+		var modules []string
+		// Update all active modules if the -u flag presents.
+		if update {
+			mc, coll := c.collect(true)
+			if coll.err != nil {
+				return coll.err
 			}
+			for _, m := range mc.AllModules {
+				if m.Owner() == nil || !isProbablyModule(m.Path()) {
+					continue
+				}
+				modules = append(modules, m.Path())
+			}
+		} else {
+			for _, m := range c.moduleConfig.Imports {
+				if !isProbablyModule(m.Path) {
+					// Skip themes/components stored below /themes etc.
+					// There may be false positives in the above, but those
+					// should be rare, and they will fail below with an
+					// "cannot find module providing ..." message.
+					continue
+				}
+				modules = append(modules, m.Path)
+			}
+		}
+
+		for _, m := range modules {
 			var args []string
 
 			if update && !patch {
@@ -333,7 +351,7 @@ func (c *Client) Get(args ...string) error {
 			} else if update && patch {
 				args = append(args, "-u=patch")
 			}
-			args = append(args, m.Path)
+			args = append(args, m)
 
 			if err := c.get(args...); err != nil {
 				return err
@@ -539,7 +557,7 @@ func (c *Client) rewriteGoMod(name string, isGoMod map[string]bool) error {
 		return err
 	}
 	if data != nil {
-		if err := afero.WriteFile(c.fs, filepath.Join(c.ccfg.WorkingDir, name), data, 0666); err != nil {
+		if err := afero.WriteFile(c.fs, filepath.Join(c.ccfg.WorkingDir, name), data, 0o666); err != nil {
 			return err
 		}
 	}
@@ -617,7 +635,8 @@ func (c *Client) rmVendorDir(vendorDir string) error {
 func (c *Client) runGo(
 	ctx context.Context,
 	stdout io.Writer,
-	args ...string) error {
+	args ...string,
+) error {
 	if c.goBinaryStatus != 0 {
 		return nil
 	}
@@ -740,6 +759,9 @@ type ClientConfig struct {
 
 	// Absolute path to the project's themes dir.
 	ThemesDir string
+
+	// The publish dir.
+	PublishDir string
 
 	// Eg. "production"
 	Environment string

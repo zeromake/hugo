@@ -1,4 +1,4 @@
-// Copyright 2023 The Hugo Authors. All rights reserved.
+// Copyright 2024 The Hugo Authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -109,7 +109,7 @@ LINE1
 
 * Autolink: https://gohugo.io/
 * Strikethrough:~~Hi~~ Hello, world!
- 
+
 ## Table
 
 | foo | bar |
@@ -137,7 +137,7 @@ That's some text with a footnote.[^1]
 ## Definition Lists
 
 date
-: the datetime assigned to this page. 
+: the datetime assigned to this page.
 
 description
 : the description for the content.
@@ -204,8 +204,8 @@ unsafe = true
 
 	toc, ok := b.(converter.TableOfContentsProvider)
 	c.Assert(ok, qt.Equals, true)
-	tocHTML := toc.TableOfContents().ToHTML(1, 2, false)
-	c.Assert(tocHTML, qt.Contains, "TableOfContents")
+	tocString := string(toc.TableOfContents().ToHTML(1, 2, false))
+	c.Assert(tocString, qt.Contains, "TableOfContents")
 }
 
 func TestConvertAutoIDAsciiOnly(t *testing.T) {
@@ -483,7 +483,6 @@ noclasses=false
 	})
 
 	c.Run("Highlight lines, default config", func(c *qt.C) {
-
 		result := convertForConfig(c, cfgStrHighlichgtNoClasses, lines, `bash {linenos=table,hl_lines=[2 "4-5"],linenostart=3}`)
 		c.Assert(result, qt.Contains, "<div class=\"highlight\"><div class=\"chroma\">\n<table class=\"lntable\"><tr><td class=\"lntd\">\n<pre tabindex=\"0\" class=\"chroma\"><code><span class")
 		c.Assert(result, qt.Contains, "<span class=\"hl\"><span class=\"lnt\">4")
@@ -614,17 +613,6 @@ func unsafeConf() config.AllProvider {
 unsafe = true
 `)
 	return testconfig.GetTestConfig(nil, cfg)
-
-}
-
-func safeConf() config.AllProvider {
-	cfg := config.FromTOMLConfigString(`
-[markup]
-[markup.goldmark.renderer]
-unsafe = false
-`)
-	return testconfig.GetTestConfig(nil, cfg)
-
 }
 
 func TestConvertCJK(t *testing.T) {
@@ -673,6 +661,60 @@ eastAsianLineBreaks=true
 	got := string(b.Bytes())
 
 	c.Assert(got, qt.Contains, "<p>私は太郎です。プログラミングが好きで、運動が苦手です。</p>\n")
+}
+
+func TestConvertCJKWithExtensionWithEastAsianLineBreaksOptionWithSimple(t *testing.T) {
+	c := qt.New(t)
+
+	content := `
+私は太郎です。
+Programming が好きで、
+運動が苦手です。
+`
+
+	confStr := `
+[markup]
+[markup.goldmark]
+[markup.goldmark.extensions.CJK]
+enable=true
+eastAsianLineBreaks=true
+eastAsianLineBreaksStyle="simple"
+`
+
+	cfg := config.FromTOMLConfigString(confStr)
+	conf := testconfig.GetTestConfig(nil, cfg)
+
+	b := convert(c, conf, content)
+	got := string(b.Bytes())
+
+	c.Assert(got, qt.Contains, "<p>私は太郎です。\nProgramming が好きで、運動が苦手です。</p>\n")
+}
+
+func TestConvertCJKWithExtensionWithEastAsianLineBreaksOptionWithStyle(t *testing.T) {
+	c := qt.New(t)
+
+	content := `
+私は太郎です。
+Programming が好きで、
+運動が苦手です。
+`
+
+	confStr := `
+[markup]
+[markup.goldmark]
+[markup.goldmark.extensions.CJK]
+enable=true
+eastAsianLineBreaks=true
+eastAsianLineBreaksStyle="css3draft"
+`
+
+	cfg := config.FromTOMLConfigString(confStr)
+	conf := testconfig.GetTestConfig(nil, cfg)
+
+	b := convert(c, conf, content)
+	got := string(b.Bytes())
+
+	c.Assert(got, qt.Contains, "<p>私は太郎です。Programming が好きで、運動が苦手です。</p>\n")
 }
 
 func TestConvertCJKWithExtensionWithEscapedSpaceOption(t *testing.T) {

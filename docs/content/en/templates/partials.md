@@ -8,8 +8,8 @@ menu:
     parent: templates
     weight: 120
 weight: 120
-aliases: [/templates/partial/,/layout/chrome/,/extras/analytics/]
 toc: true
+aliases: [/templates/partial/,/layout/chrome/,/extras/analytics/]
 ---
 
 {{< youtube pjS4pOLyB7c >}}
@@ -18,8 +18,8 @@ toc: true
 
 Partial templates---like [single page templates][singletemps] and [list page templates][listtemps]---have a specific [lookup order]. However, partials are simpler in that Hugo will only check in two places:
 
-1. `layouts/partials/*<PARTIALNAME>.html`
-2. `themes/<THEME>/layouts/partials/*<PARTIALNAME>.html`
+1. `layouts/partials/<PARTIALNAME>.html`
+2. `themes/<THEME>/layouts/partials/<PARTIALNAME>.html`
 
 This allows a theme's end user to copy a partial's contents into a file of the same name for [further customization][customize].
 
@@ -68,7 +68,7 @@ As shown in the above example directory structure, you can nest your directories
 
 The second argument in a partial call is the variable being passed down. The above examples are passing the `.`, which tells the template receiving the partial to apply the current [context][context].
 
-This means the partial will *only* be able to access those variables. The partial is isolated and *has no access to the outer scope*. From within the partial, `$.Var` is equivalent to `.Var`.
+This means the partial will *only* be able to access those variables. The partial is isolated and cannot access the outer scope. From within the partial, `$.Var` is equivalent to `.Var`.
 
 ## Returning a value from a partial
 
@@ -128,7 +128,7 @@ Value: {{ partial "my-inline-partial.html" . }}
 
 ## Cached partials
 
-The `partialCached` template function provides significant performance gains for complex templates that don't need to be re-rendered on every invocation. See [details][partialcached].
+The `partialCached` template function provides significant performance gains for complex templates that don't need to be re-rendered on every invocation. See&nbsp;[details][partialcached].
 
 ## Examples
 
@@ -136,7 +136,7 @@ The `partialCached` template function provides significant performance gains for
 
 The following `header.html` partial template is used for [spf13.com](https://spf13.com/):
 
-{{< code file="layouts/partials/header.html" >}}
+{{< code file=layouts/partials/header.html >}}
 <!DOCTYPE html>
 <html class="no-js" lang="en-US" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
 <head>
@@ -161,7 +161,7 @@ The `header.html` example partial was built before the introduction of block tem
 
 The following `footer.html` partial template is used for [spf13.com](https://spf13.com/):
 
-{{< code file="layouts/partials/footer.html" >}}
+{{< code file=layouts/partials/footer.html >}}
 <footer>
   <div>
     <p>
@@ -177,6 +177,6 @@ The following `footer.html` partial template is used for [spf13.com](https://spf
 [customize]: /hugo-modules/theme-components/
 [listtemps]: /templates/lists/
 [lookup order]: /templates/lookup-order/
-[partialcached]: /functions/partialcached/
+[partialcached]: /functions/partials/includecached/
 [singletemps]: /templates/single-page-templates/
 [themes]: /themes/

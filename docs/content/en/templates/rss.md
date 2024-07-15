@@ -1,8 +1,8 @@
 ---
 title: RSS templates
-description: Use the built-in RSS template, or create your own.
-keywords: [rss, xml, templates]
+description: Use the embedded RSS template, or create your own.
 categories: [templates]
+keywords: [rss,xml,templates]
 menu:
   docs:
     parent: templates
@@ -15,7 +15,7 @@ toc: true
 
 By default, when you build your site, Hugo generates RSS feeds for home, section, taxonomy, and term pages. Control feed generation in your site configuration. For example, to generate feeds for home and section pages, but not for taxonomy and term pages:
 
-{{< code-toggle file=hugo copy=false >}}
+{{< code-toggle file=hugo >}}
 [outputs]
 home = ['html', 'rss']
 section = ['html', 'rss']
@@ -25,13 +25,15 @@ term = ['html']
 
 To disable feed generation for all [page kinds]:
 
-{{< code-toggle file=hugo copy=false >}}
+[page kinds]: /getting-started/glossary/#page-kind
+
+{{< code-toggle file=hugo >}}
 disableKinds = ['rss']
 {{< /code-toggle >}}
 
 By default, the number of items in each feed is unlimited. Change this as needed in your site configuration:
 
-{{< code-toggle file=hugo copy=false >}}
+{{< code-toggle file=hugo >}}
 [services.rss]
 limit = 42
 {{< /code-toggle >}}
@@ -40,9 +42,9 @@ Set `limit` to `-1` to generate an unlimited number of items per feed.
 
 The built-in RSS template will render the following values, if present, from your site configuration:
 
-{{< code-toggle file=hugo copy=false >}}
+{{< code-toggle file=hugo >}}
 copyright = '© 2023 ABC Widgets, Inc.'
-[author]
+[params.author]
 name = 'John Doe'
 email = 'jdoe@example.org'
 {{< /code-toggle >}}
@@ -65,7 +67,10 @@ Hugo will render this to:
 
 ## Custom templates
 
-Override Hugo's [built-in RSS template] by creating one or more of your own, following the naming conventions as shown in the [template lookup order table].
+Override Hugo's [embedded RSS template] by creating one or more of your own, following the naming conventions as shown in the [template lookup order].
+
+[embedded RSS template]: {{% eturl rss %}}
+[template lookup order]: #template-lookup-order
 
 For example, to use different templates for home, section, taxonomy, and term pages:
 
@@ -79,10 +84,6 @@ layouts/
 ```
 
 RSS templates receive the `.Page` and `.Site` objects in context.
-
-[built-in RSS template]: https://github.com/gohugoio/hugo/blob/master/tpl/tplimpl/embedded/templates/_default/rss.xml
-[page kinds]: /getting-started/glossary/#page-kind
-[template lookup order table]: #template-lookup-order
 
 ## Template lookup order
 

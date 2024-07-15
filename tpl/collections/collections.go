@@ -17,30 +17,23 @@ package collections
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"html/template"
 	"math/rand"
 	"net/url"
 	"reflect"
 	"strings"
 	"time"
 
-	"errors"
-
 	"github.com/gohugoio/hugo/common/collections"
+	"github.com/gohugoio/hugo/common/hugo"
 	"github.com/gohugoio/hugo/common/maps"
 	"github.com/gohugoio/hugo/common/types"
 	"github.com/gohugoio/hugo/deps"
-	"github.com/gohugoio/hugo/helpers"
 	"github.com/gohugoio/hugo/langs"
 	"github.com/gohugoio/hugo/tpl/compare"
 	"github.com/spf13/cast"
 )
-
-func init() {
-	// htime.Now cannot be used here
-	rand.Seed(time.Now().UTC().UnixNano())
-}
 
 // New returns a new instance of the collections-namespaced template functions.
 func New(deps *deps.Deps) *Namespace {
@@ -101,7 +94,7 @@ func (ns *Namespace) After(n any, l any) (any, error) {
 
 // Delimit takes a given list l and returns a string delimited by sep.
 // If last is passed to the function, it will be used as the final delimiter.
-func (ns *Namespace) Delimit(ctx context.Context, l, sep any, last ...any) (template.HTML, error) {
+func (ns *Namespace) Delimit(ctx context.Context, l, sep any, last ...any) (string, error) {
 	d, err := cast.ToStringE(sep)
 	if err != nil {
 		return "", err
@@ -151,10 +144,10 @@ func (ns *Namespace) Delimit(ctx context.Context, l, sep any, last ...any) (temp
 		}
 
 	default:
-		return "", fmt.Errorf("can't iterate over %v", l)
+		return "", fmt.Errorf("can't iterate over %T", l)
 	}
 
-	return template.HTML(str), nil
+	return str, nil
 }
 
 // Dictionary creates a new map from the given parameters by
@@ -200,7 +193,7 @@ func (ns *Namespace) Dictionary(values ...any) (map[string]any, error) {
 // empty string.
 // Deprecated: Use the index function instead.
 func (ns *Namespace) EchoParam(c, k any) any {
-	helpers.Deprecated("collections.EchoParam", "Use the index function instead.", false)
+	hugo.Deprecate("collections.EchoParam", "Use the index function instead.", "v0.120.0")
 	av, isNil := indirect(reflect.ValueOf(c))
 	if isNil {
 		return ""
@@ -579,7 +572,7 @@ func (ns *Namespace) Seq(args ...any) ([]int, error) {
 	return seq, nil
 }
 
-// Shuffle returns list l in a randomised order.
+// Shuffle returns list l in a randomized order.
 func (ns *Namespace) Shuffle(l any) (any, error) {
 	if l == nil {
 		return nil, errors.New("both count and seq must be provided")
@@ -624,10 +617,10 @@ type intersector struct {
 }
 
 func (i *intersector) appendIfNotSeen(v reflect.Value) {
-	vi := v.Interface()
-	if !i.seen[vi] {
+	k := normalize(v)
+	if !i.seen[k] {
 		i.r = reflect.Append(i.r, v)
-		i.seen[vi] = true
+		i.seen[k] = true
 	}
 }
 
@@ -645,7 +638,7 @@ func (i *intersector) handleValuePair(l1vv, l2vv reflect.Value) {
 			i.appendIfNotSeen(l1vv)
 		}
 	case kind == reflect.Ptr, kind == reflect.Struct:
-		if l1vv.Interface() == l2vv.Interface() {
+		if types.Unwrapv(l1vv.Interface()) == types.Unwrapv(l2vv.Interface()) {
 			i.appendIfNotSeen(l1vv)
 		}
 	case kind == reflect.Interface:

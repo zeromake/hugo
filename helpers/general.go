@@ -27,15 +27,11 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/gohugoio/hugo/common/hugo"
-	"github.com/gohugoio/hugo/common/loggers"
-
 	"github.com/spf13/afero"
 
 	"github.com/jdkato/prose/transform"
 
 	bp "github.com/gohugoio/hugo/bufferpool"
-	"github.com/spf13/pflag"
 )
 
 // FilePathSeparator as defined by os.Separator.
@@ -192,7 +188,7 @@ func ReaderContains(r io.Reader, subslice []byte) bool {
 //
 // - "Go" (strings.Title)
 // - "AP" (see https://www.apstylebook.com/)
-// - "Chicago" (see http://www.chicagomanualofstyle.org/home.html)
+// - "Chicago" (see https://www.chicagomanualofstyle.org/home.html)
 // - "FirstUpper" (only the first character is upper case)
 // - "None" (no transformation)
 //
@@ -200,6 +196,7 @@ func ReaderContains(r io.Reader, subslice []byte) bool {
 func GetTitleFunc(style string) func(s string) string {
 	switch strings.ToLower(style) {
 	case "go":
+		//lint:ignore SA1019 keep for now.
 		return strings.Title
 	case "chicago":
 		tc := transform.NewTitleConverter(transform.ChicagoStyle)
@@ -246,19 +243,6 @@ func compareStringSlices(a, b []string) bool {
 	return true
 }
 
-// Deprecated informs about a deprecation, but only once for a given set of arguments' values.
-// If the err flag is enabled, it logs as an ERROR (will exit with -1) and the text will
-// point at the next Hugo release.
-// The idea is two remove an item in two Hugo releases to give users and theme authors
-// plenty of time to fix their templates.
-func Deprecated(item, alternative string, err bool) {
-	if err {
-		loggers.Log().Errorf("%s is deprecated and will be removed in Hugo %s. %s", item, hugo.CurrentVersion.Next().ReleaseVersion(), alternative)
-	} else {
-		loggers.Log().Warnf("%s is deprecated and will be removed in a future release. %s", item, alternative)
-	}
-}
-
 // SliceToLower goes through the source slice and lowers all values.
 func SliceToLower(s []string) []string {
 	if s == nil {
@@ -280,10 +264,11 @@ func MD5String(f string) string {
 	return hex.EncodeToString(h.Sum([]byte{}))
 }
 
-// MD5FromFileFast creates a MD5 hash from the given file. It only reads parts of
+// MD5FromReaderFast creates a MD5 hash from the given file. It only reads parts of
 // the file for speed, so don't use it if the files are very subtly different.
 // It will not close the file.
-func MD5FromFileFast(r io.ReadSeeker) (string, error) {
+// It will return the MD5 hash and the size of r in bytes.
+func MD5FromReaderFast(r io.ReadSeeker) (string, int64, error) {
 	const (
 		// Do not change once set in stone!
 		maxChunks = 8
@@ -301,7 +286,7 @@ func MD5FromFileFast(r io.ReadSeeker) (string, error) {
 				if err == io.EOF {
 					break
 				}
-				return "", err
+				return "", 0, err
 			}
 		}
 
@@ -311,12 +296,14 @@ func MD5FromFileFast(r io.ReadSeeker) (string, error) {
 				h.Write(buff)
 				break
 			}
-			return "", err
+			return "", 0, err
 		}
 		h.Write(buff)
 	}
 
-	return hex.EncodeToString(h.Sum(nil)), nil
+	size, _ := r.Seek(0, io.SeekEnd)
+
+	return hex.EncodeToString(h.Sum(nil)), size, nil
 }
 
 // MD5FromReader creates a MD5 hash from the given reader.
@@ -333,18 +320,6 @@ func IsWhitespace(r rune) bool {
 	return r == ' ' || r == '\t' || r == '\n' || r == '\r'
 }
 
-// NormalizeHugoFlags facilitates transitions of Hugo command-line flags,
-// e.g. --baseUrl to --baseURL, --uglyUrls to --uglyURLs
-func NormalizeHugoFlags(f *pflag.FlagSet, name string) pflag.NormalizedName {
-	switch name {
-	case "baseUrl":
-		name = "baseURL"
-	case "uglyUrls":
-		name = "uglyURLs"
-	}
-	return pflag.NormalizedName(name)
-}
-
 // PrintFs prints the given filesystem to the given writer starting from the given path.
 // This is useful for debugging.
 func PrintFs(fs afero.Fs, path string, w io.Writer) {
@@ -353,7 +328,32 @@ func PrintFs(fs afero.Fs, path string, w io.Writer) {
 	}
 
 	afero.Walk(fs, path, func(path string, info os.FileInfo, err error) error {
-		fmt.Println(path)
+		if err != nil {
+			panic(fmt.Sprintf("error: path %q: %s", path, err))
+		}
+		path = filepath.ToSlash(path)
+		if path == "" {
+			path = "."
+		}
+		fmt.Fprintln(w, path, info.IsDir())
 		return nil
 	})
+}
+
+// FormatByteCount pretty formats b.
+func FormatByteCount(bc uint64) string {
+	const (
+		Gigabyte = 1 << 30
+		Megabyte = 1 << 20
+		Kilobyte = 1 << 10
+	)
+	switch {
+	case bc > Gigabyte || -bc > Gigabyte:
+		return fmt.Sprintf("%.2f GB", float64(bc)/Gigabyte)
+	case bc > Megabyte || -bc > Megabyte:
+		return fmt.Sprintf("%.2f MB", float64(bc)/Megabyte)
+	case bc > Kilobyte || -bc > Kilobyte:
+		return fmt.Sprintf("%.2f KB", float64(bc)/Kilobyte)
+	}
+	return fmt.Sprintf("%d B", bc)
 }
